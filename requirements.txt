@@ -15,6 +15,7 @@ docutils==0.14
 entrypoints==0.2.3
 Flask==0.12.2
 Flask-WTF==0.14.2
+gunicorn==19.7.1
 html5lib==1.0.1
 idna==2.6
 imagesize==0.7.1
