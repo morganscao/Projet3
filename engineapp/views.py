@@ -12,30 +12,75 @@ app.config.from_object('config')
 # Load
 #results = np.load('RecommendingResult.npy').item()
 results = np.load(app.config['ENGINE_DATABASE']).item()
+#results = sorted(results)
 
+NBRECOMMEND = 3
+NOTFOUND = "not_found"
 
 # On fait un dico avec des id numériques
+i0 = 100001
+i = i0
 iddict = {}
-i=10001
 for k, v in results.items():
     iddict[i] = v
     i += 1
+
+dic_name_id = {}
+i = i0
+for k, v in results.items():
+    dic_name_id[k] = i
+    i += 1
+       
+
+imax = i-1
+
+def getid(name):
+    name = name.lower()
+    return dic_name_id[name]
     
+def getname(id):
+    for k, v in dic_name_id.items():
+        if v == id:
+            return k
+    return NOTFOUND
+   
 @app.route('/')
 def index():
-    return "Ajoutez /recommend/<id> à l'adresse actuelle pour une recommendation"
-
+    return "<h2>Ajoutez /recommend/nom_du_film ou /recommend/id à l'adresse actuelle pour une recommandation de film</h2>" + "<h3>Les id vont de " + str(i0) + " à " + str(imax) + "</h3>"
 
 @app.route('/recommend/<id>', methods=['GET'])
 def recommend(id):
     id = id.lower()
     if id in results:
-        return jsonify({"_results":results[id][:10]})
+        #return jsonify({"_results":results[id][:NBRECOMMEND]})
+        return jsonify(formatresult(results, id))
 
     if int(id) in iddict:
-        return jsonify({"_results":iddict[int(id)][:10]})
+        name = getname(int(id))
+        if name == NOTFOUND:
+            return not_found()
+        #return jsonify({"_results":iddict[int(id)][:NBRECOMMEND]})
+        return jsonify(formatresult(results, name))
 
     return not_found()
+
+def formatresult(tbl, name):
+    # Nombre max à afficher
+    imax = 10
+    t = []
+    i = 0
+    for row in tbl[name]:
+        d = {}
+        d["id"] = str(getid(row[1]))
+        d["name"] = row[1]
+        #d["score"] = row[0]
+        t.append(d)
+        i += 1
+        if i == imax:
+            break
+
+    ret = {"_results":t}
+    return ret
 
 
 @app.errorhandler(404)
