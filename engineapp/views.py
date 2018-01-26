@@ -1,4 +1,5 @@
 import numpy as np
+import random
 from flask import Flask
 from flask import jsonify, request
 
@@ -46,7 +47,10 @@ def getname(id):
    
 @app.route('/')
 def index():
-    return "<h2>Ajoutez /recommend/nom_du_film ou /recommend/id à l'adresse actuelle pour une recommandation de film</h2>" + "<h3>Les id vont de " + str(i0) + " à " + str(imax) + "</h3>"
+    accueil = '<h1 align="center">Moteur de recommandation de films</h1>'
+    accueil += "<h2>Ajoutez /recommend/nom_du_film ou /recommend/id à l'adresse actuelle pour une recommandation de film</h2>"
+    accueil += "<h3>Les id des films vont de " + str(i0) + " à " + str(imax) + "</h3>"
+    return accueil
 
 @app.route('/recommend/<id>', methods=['GET'])
 def recommend(id):
@@ -65,19 +69,15 @@ def recommend(id):
     return not_found()
 
 def formatresult(tbl, name):
-    # Nombre max à afficher
-    imax = 10
+    # On prends 5 au hasard parmi les 10 plus proches
+    rnd = random.sample(tbl[name], 5)
     t = []
-    i = 0
-    for row in tbl[name]:
+    for row in rnd:
         d = {}
         d["id"] = str(getid(row[1]))
         d["name"] = row[1]
         #d["score"] = row[0]
         t.append(d)
-        i += 1
-        if i == imax:
-            break
 
     ret = {"_results":t}
     return ret
