@@ -48,7 +48,7 @@ def getname(id):
 @app.route('/')
 def index():
     accueil = '<h1 align="center">Moteur de recommandation de films</h1>'
-    accueil += "<h2>Ajoutez /recommend/nom_du_film ou /recommend/id à l'adresse actuelle pour une recommandation de film</h2>"
+    accueil += "<h2 style=""margin-top:50"">Ajoutez /recommend/nom_du_film ou /recommend/id à l'adresse actuelle pour une recommandation de film</h2>"
     accueil += "<h3>Les id des films vont de " + str(i0) + " à " + str(imax) + "</h3>"
     return accueil
 
@@ -59,13 +59,15 @@ def recommend(id):
         #return jsonify({"_results":results[id][:NBRECOMMEND]})
         return jsonify(formatresult(results, id))
 
-    if int(id) in iddict:
-        name = getname(int(id))
-        if name == NOTFOUND:
-            return not_found()
-        #return jsonify({"_results":iddict[int(id)][:NBRECOMMEND]})
-        return jsonify(formatresult(results, name))
-
+    try:
+        if int(id) in iddict:
+            name = getname(int(id))
+            if name == NOTFOUND:
+                return not_found()
+            #return jsonify({"_results":iddict[int(id)][:NBRECOMMEND]})
+            return jsonify(formatresult(results, name))
+    except:
+        return not_found()
     return not_found()
 
 def formatresult(tbl, name):

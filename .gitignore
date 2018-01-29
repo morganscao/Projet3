@@ -3,3 +3,4 @@
 *.pyc
 desktop.ini
 __pycache__
+~$*.*
